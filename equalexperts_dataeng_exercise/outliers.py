@@ -2,7 +2,7 @@
 
 Creates the blog_analysis.outlier_weeks view and prints its contents.
 """
-
+from __future__ import annotations
 import duckdb
 
 from equalexperts_dataeng_exercise.scripts.exercise import run_query

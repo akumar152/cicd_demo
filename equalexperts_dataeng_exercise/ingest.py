@@ -1,5 +1,6 @@
 """Incremental ingestion of vote data into DuckDB."""
 
+from __future__ import annotations
 import sys
 from pathlib import Path
 import duckdb
