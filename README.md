@@ -215,46 +215,46 @@ The incoming JSONL data is first loaded into a temporary table before being writ
 # 1. Data quality measures I would apply in production
 
 The most important checks for this pipeline would be schema validation, null and uniqueness checks on Id, duplicate detection, record-count reconciliation, and monitoring for failed or rejected records.
-    • Row count reconciliation
-    • Data reconciliation (validation)
-    • Schema and record validation
-    • Validate each JSON line against a strict JSON Schema (Id, PostId, VoteTypeId, CreationDate types and required fields)
-    • Null checks
-    • Timeliness
-    • Data Type checks
-    • Deduplication & idempotency
-    • Quarantine and error handling
-    • Proper audit columns
-    • View and analytic checks (outliers)
-    • Negative scanerio(bad records/wrong datatype)
-    • schema evolution(strict/allowed based on buisness requirement)
+    * Row count reconciliation
+    * Data reconciliation (validation)
+    * Schema and record validation
+    * Validate each JSON line against a strict JSON Schema (Id, PostId, VoteTypeId, CreationDate types and required fields)
+    * Null checks
+    * Timeliness
+    * Data Type checks
+    * Deduplication & idempotency
+    * Quarantine and error handling
+    * Proper audit columns
+    * View and analytic checks (outliers)
+    * Negative scanerio(bad records/wrong datatype)
+    * schema evolution(strict/allowed based on buisness requirement)
 
 # 2. What would need to change for a 10TB dataset with 5GB new data arriving each day?
 
 ### 2. What would need to change for the solution to scale to a 10TB dataset with 5GB new data arriving each day?
 
 The current solution uses DuckDB and is suitable for the exercise, but I would change the architecture for a 10TB dataset.
-    • **Storage** – Store the raw and curated data in scalable object storage such as S3 or ADLS rather than relying on a local DuckDB database file.
-    • **File format** – Store the data in Parquet because it is columnar and supports efficient analytical reads.
-    • **Incremental processing** – Process only the new 5GB of data each day instead of scanning the complete 10TB dataset.
-    • **Distributed processing** – Use a distributed processing engine such as Spark when the data volume or transformation complexity requires it.
-    • **Partitioning** – Partition the data by an appropriate date column, such as `CreationDate`, to reduce the amount of data scanned.
-    • **Upserts** – Use a scalable table format such as Delta Lake to efficiently handle inserts and updates rather than repeatedly rewriting
+    * **Storage** – Store the raw and curated data in scalable object storage such as S3 or ADLS rather than relying on a local DuckDB database file.
+    * **File format** – Store the data in Parquet because it is columnar and supports efficient analytical reads.
+    * **Incremental processing** – Process only the new 5GB of data each day instead of scanning the complete 10TB dataset.
+    * **Distributed processing** – Use a distributed processing engine such as Spark when the data volume or transformation complexity requires it.
+    * **Partitioning** – Partition the data by an appropriate date column, such as `CreationDate`, to reduce the amount of data scanned.
+    * **Upserts** – Use a scalable table format such as Delta Lake to efficiently handle inserts and updates rather than repeatedly rewriting
         large portions of the dataset.
-    • **Data quality** – Run validation checks on each incremental batch and quarantine invalid records.
-    • **Monitoring** – Track records received, inserted, updated, rejected records, processing time, and failures.
-    • **Idempotency and recovery** – Maintain checkpoints or processing metadata so that a failed daily load can be safely retried without creating
+    * **Data quality** – Run validation checks on each incremental batch and quarantine invalid records.
+    * **Monitoring** – Track records received, inserted, updated, rejected records, processing time, and failures.
+    * **Idempotency and recovery** – Maintain checkpoints or processing metadata so that a failed daily load can be safely retried without creating
         duplicates.
 
 # 3. Assumptions made in this solution
 
 The following assumptions were made for this solution:
-    • `Id` uniquely identifies a vote and is therefore used as the key for upserts.
-    • The input file is a JSONL file containing `Id`, `PostId`, `VoteTypeId`, and `CreationDate`.
-    • `CreationDate` is a valid timestamp and is used to determine the year and week of a vote.
-    • A week is considered an outlier when it differs from the average weekly vote count by more than 20%, using the formula specified in the exercise.
-    • The week numbering follows the Sunday-based numbering required by the provided test data.
-    • Invalid or malformed source records are outside the scope of this exercise and would be handled through data-quality validation in a production
+    * `Id` uniquely identifies a vote and is therefore used as the key for upserts.
+    * The input file is a JSONL file containing `Id`, `PostId`, `VoteTypeId`, and `CreationDate`.
+    * `CreationDate` is a valid timestamp and is used to determine the year and week of a vote.
+    * A week is considered an outlier when it differs from the average weekly vote count by more than 20%, using the formula specified in the exercise.
+    * The week numbering follows the Sunday-based numbering required by the provided test data.
+    * Invalid or malformed source records are outside the scope of this exercise and would be handled through data-quality validation in a production
       implementation.
 
 
