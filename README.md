@@ -215,19 +215,19 @@ The incoming JSONL data is first loaded into a temporary table before being writ
 # 1. Data quality measures I would apply in production
 
 The most important checks for this pipeline would be schema validation, null and uniqueness checks on Id, duplicate detection, record-count reconciliation, and monitoring for failed or rejected records.
-    * Row count reconciliation
-    * Data reconciliation (validation)
-    * Schema and record validation
-    * Validate each JSON line against a strict JSON Schema (Id, PostId, VoteTypeId, CreationDate types and required fields)
-    * Null checks
-    * Timeliness
-    * Data Type checks
-    * Deduplication & idempotency
-    * Quarantine and error handling
-    * Proper audit columns
-    * View and analytic checks (outliers)
-    * Negative scanerio(bad records/wrong datatype)
-    * schema evolution(strict/allowed based on buisness requirement)
+    *  Row count reconciliation
+    *  Data reconciliation (validation)
+    *  Schema and record validation
+    *  Validate each JSON line against a strict JSON Schema (Id, PostId, VoteTypeId, CreationDate types and required fields)
+    *  Null checks
+    *  Timeliness
+    *  Data Type checks
+    *  Deduplication & idempotency
+    *  Quarantine and error handling
+    *  Proper audit columns
+    *  View and analytic checks (outliers)
+    *  Negative scanerio(bad records/wrong datatype)
+    *  schema evolution(strict/allowed based on buisness requirement)
 
 # 2. What would need to change for a 10TB dataset with 5GB new data arriving each day?
 
