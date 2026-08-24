@@ -26,7 +26,7 @@ types-requests = "^2.31.0.1"
 
 [tool.poetry.scripts]
 exercise = "equalexperts_dataeng_exercise.scripts.exercise:main"
-git commit -m "Complete data engineering exercise"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

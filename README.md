@@ -197,7 +197,7 @@ This makes the ingestion idempotent and prevents duplicate records when the same
 
 The incoming JSONL data is first loaded into a temporary table before being written to the target table. This keeps the source data separate from the final analytics table and allows the data to be transformed before loading.
 
-## Outlier detection
+### Outlier detection
  The outlier calculation is then implemented as a SQL view over the ingested data, grouping by year and week and filtering on the percentage-difference rule in the README.
 
 
