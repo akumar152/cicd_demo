@@ -250,12 +250,13 @@ The current solution uses DuckDB and is suitable for the exercise, but I would c
 # 3. Assumptions made in this solution
 
 The following assumptions were made for this solution:
-    *  `Id` uniquely identifies a vote and is therefore used as the key for upserts.
-    *  The input file is a JSONL file containing `Id`, `PostId`, `VoteTypeId`, and `CreationDate`.
-    *  `CreationDate` is a valid timestamp and is used to determine the year and week of a vote.
-    *  A week is considered an outlier when it differs from the average weekly vote count by more than 20%, using the formula specified in the exercise.
-    *  The week numbering follows the Sunday-based numbering required by the provided test data.
-    *  Invalid or malformed source records are outside the scope of this exercise and would be handled through data-quality validation in a production implementation.
+
+    •  `Id` uniquely identifies a vote and is therefore used as the key for upserts.
+    •  The input file is a JSONL file containing `Id`, `PostId`, `VoteTypeId`, and `CreationDate`.
+    •  `CreationDate` is a valid timestamp and is used to determine the year and week of a vote.
+    •  A week is considered an outlier when it differs from the average weekly vote count by more than 20%, using the formula specified in the exercise.
+    •  The week numbering follows the Sunday-based numbering required by the provided test data.
+    •  Invalid or malformed source records are outside the scope of this exercise and would be handled through data-quality validation in a production implementation.
 
 
 ## AI Tool Usage
