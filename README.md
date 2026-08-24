@@ -185,7 +185,78 @@ Please include instructions about your strategy and important decisions you made
 
 ## Your Approach and answers to follow-up questions 
 
-_Please provide an explaination to your implementation approach and the additional questions **here**_
+My approach was to keep the solution intentionally small and SQL-native, matching the exercise scope and the evaluation rubric. 
+### Incremental Upsert
+
+`Id` is used as the unique key for each vote.  
+`INSERT ... ON CONFLICT (Id) DO UPDATE` is used so that new records are inserted and existing records are updated.
+
+This makes the ingestion idempotent and prevents duplicate records when the same data is processed multiple times.
+
+### Temporary Staging Table
+
+The incoming JSONL data is first loaded into a temporary table before being written to the target table. This keeps the source data separate from the final analytics table and allows the data to be transformed before loading.
+
+## Outlier detection
+ The outlier calculation is then implemented as a SQL view over the ingested data, grouping by year and week and filtering on the percentage-difference rule in the README.
+
+
+ ### Test Coverage
+
+1. The ingestion tests verify:
+    • initial data loading
+    • insertion of new records
+    • updating of existing records
+    • prevention of duplicate records
+    • idempotent ingestion
+
+2. The outlier test uses known sample data and verifies that the `outlier_weeks` view produces the expected outlier weeks and vote counts.
+
+# 1. Data quality measures I would apply in production
+
+The most important checks for this pipeline would be schema validation, null and uniqueness checks on Id, duplicate detection, record-count reconciliation, and monitoring for failed or rejected records.
+    • Row count reconciliation
+    • Data reconciliation (validation)
+    • Schema and record validation
+    • Validate each JSON line against a strict JSON Schema (Id, PostId, VoteTypeId, CreationDate types and required fields)
+    • Null checks
+    • Timeliness
+    • Data Type checks
+    • Deduplication & idempotency
+    • Quarantine and error handling
+    • Proper audit columns
+    • View and analytic checks (outliers)
+    • Negative scanerio(bad records/wrong datatype)
+    • schema evolution(strict/allowed based on buisness requirement)
+
+# 2. What would need to change for a 10TB dataset with 5GB new data arriving each day?
+
+### 2. What would need to change for the solution to scale to a 10TB dataset with 5GB new data arriving each day?
+
+The current solution uses DuckDB and is suitable for the exercise, but I would change the architecture for a 10TB dataset.
+    • **Storage** – Store the raw and curated data in scalable object storage such as S3 or ADLS rather than relying on a local DuckDB database file.
+    • **File format** – Store the data in Parquet because it is columnar and supports efficient analytical reads.
+    • **Incremental processing** – Process only the new 5GB of data each day instead of scanning the complete 10TB dataset.
+    • **Distributed processing** – Use a distributed processing engine such as Spark when the data volume or transformation complexity requires it.
+    • **Partitioning** – Partition the data by an appropriate date column, such as `CreationDate`, to reduce the amount of data scanned.
+    • **Upserts** – Use a scalable table format such as Delta Lake to efficiently handle inserts and updates rather than repeatedly rewriting
+        large portions of the dataset.
+    • **Data quality** – Run validation checks on each incremental batch and quarantine invalid records.
+    • **Monitoring** – Track records received, inserted, updated, rejected records, processing time, and failures.
+    • **Idempotency and recovery** – Maintain checkpoints or processing metadata so that a failed daily load can be safely retried without creating
+        duplicates.
+
+# 3. Assumptions made in this solution
+
+The following assumptions were made for this solution:
+    • `Id` uniquely identifies a vote and is therefore used as the key for upserts.
+    • The input file is a JSONL file containing `Id`, `PostId`, `VoteTypeId`, and `CreationDate`.
+    • `CreationDate` is a valid timestamp and is used to determine the year and week of a vote.
+    • A week is considered an outlier when it differs from the average weekly vote count by more than 20%, using the formula specified in the exercise.
+    • The week numbering follows the Sunday-based numbering required by the provided test data.
+    • Invalid or malformed source records are outside the scope of this exercise and would be handled through data-quality validation in a production
+      implementation.
+
 
 ## AI Tool Usage
 
@@ -196,3 +267,14 @@ While we encourage the use of AI tools as part of the learning process but to en
 3.  **How AI-Generated Code Was Reviewed:** Explain how you reviewed and verified the AI-generated code to ensure its correctness and quality.
 
 Please note, during the technical interview, which will build upon this exercise, we'll focus on your coding abilities and problem-solving skills without the use of AI tools. This will allow us to see your direct approach and thought process.
+
+
+## AI Tool Usage: I used copilot for this assignment. 
+
+1. ***Specific Use Cases**
+    • I used copilot for rephrasing README file.
+    • i used copilot for duckDB syntax and useage as it is new to me.
+    • I used copilot for debugging assistance.
+    
+2. ***Percentage of Code Generated by AI:** I would say 20% (mainly for duckDB usage)
+3. ***How AI-Generated Code Was Reviewed:** Manually and Also by running tests
