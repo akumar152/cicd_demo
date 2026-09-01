@@ -112,3 +112,18 @@ def test_ingest_is_idempotent():
         assert after_count == before_count
     finally:
         con.close()
+
+def test_ingest_raises_ids_can_not_be_null(tmp_path):
+    # Create a small incremental file that has a null Id
+    invalid = [
+        {"Id": None, "PostId": "999", "VoteTypeId": "2", "CreationDate": "2022-01-02T00:00:00.000"},
+    ]
+    inc_file = tmp_path / "invalid.jsonl"
+    with inc_file.open("w", encoding="utf-8") as fh:
+        for obj in invalid:
+            fh.write(json.dumps(obj) + "\n")
+
+    with pytest.raises(duckdb.CatalogException) as exc_info:
+        ingest_module.ingest(str(inc_file))
+
+    assert "NULL value in column 'Id' violates not-null constraint" in str(exc_info.value)
